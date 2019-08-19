@@ -16,19 +16,12 @@ public class minisql {
         btn_rutain.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-                jfc.setDialogTitle("Seleccione el archivo sql");
-                jfc.setAcceptAllFileFilterUsed(false);
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos sql","sql");
-                jfc.addChoosableFileFilter(filter);
-                int retvalue = jfc.showOpenDialog(null);
-                if (retvalue == JFileChooser.APPROVE_OPTION){
-                    File selectFile = jfc.getSelectedFile();
-                    ruta_SQL = selectFile.getPath();
-                }
+                Btn_rutainAction(e);
             }
+
         });
     }
+
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("minisql");
@@ -36,5 +29,17 @@ public class minisql {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+    }
+    private void Btn_rutainAction (ActionEvent evt) {
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setDialogTitle("Seleccione el archivo sql");
+        jfc.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos sql", "sql");
+        jfc.addChoosableFileFilter(filter);
+        int retvalue = jfc.showOpenDialog(null);
+        if (retvalue == JFileChooser.APPROVE_OPTION) {
+            File selectFile = jfc.getSelectedFile();
+            ruta_SQL = selectFile.getPath();
+        }
     }
 }
