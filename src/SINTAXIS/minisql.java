@@ -10,15 +10,24 @@ import java.io.File;
 public class minisql {
     private JPanel minisqlPanel;
     private JButton btn_rutain;
+    private JButton btn_Analizar;
     private String ruta_SQL;
+    private String path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/lexer.flex";
 
     public minisql() {
+        btn_Analizar.setEnabled(false);
         btn_rutain.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Btn_rutainAction(e);
             }
 
+        });
+        btn_Analizar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Btn_analizar(e);
+            }
         });
     }
 
@@ -40,6 +49,18 @@ public class minisql {
         if (retvalue == JFileChooser.APPROVE_OPTION) {
             File selectFile = jfc.getSelectedFile();
             ruta_SQL = selectFile.getPath();
+            btn_Analizar.setEnabled(true);
         }
+    }
+    private void Btn_analizar(ActionEvent evt){
+        GenerarLexer(path);
+    }
+    private void GenerarLexer(String path){
+        File lexRules = new File(path);
+         String temp_path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/Lexer.java";
+         File temp = new File(temp_path);
+         if(!temp.exists()){
+             jflex.Main.generate(lexRules);
+         }
     }
 }
