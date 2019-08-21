@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class minisql {
+public class minisql extends javax.swing.JFrame{
     private JPanel minisqlPanel;
     private JButton btn_rutain;
     private JButton btn_Analizar;
@@ -38,6 +38,7 @@ public class minisql {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
     }
     private void Btn_rutainAction (ActionEvent evt) {
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -59,7 +60,11 @@ public class minisql {
         File lexRules = new File(path);
          String temp_path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/Lexer.java";
          File temp = new File(temp_path);
-         if(!temp.exists()){
+         if(temp.exists()){
+             if(temp.delete()){
+                 jflex.Main.generate(lexRules);
+             }
+         }else{
              jflex.Main.generate(lexRules);
          }
     }
