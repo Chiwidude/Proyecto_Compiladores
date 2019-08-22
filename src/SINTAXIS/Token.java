@@ -19,7 +19,7 @@ public enum Token {
         MENOR,
         MAYOR_IGUAL,
         MENOR_IGUAL,
-        DIFERENTE,
+        DIFERENCIA,
         AND,
         OR,
         EXCLAMACION,
