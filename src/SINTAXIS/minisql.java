@@ -6,6 +6,7 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 public class minisql extends javax.swing.JFrame{
     private JPanel minisqlPanel;
@@ -55,6 +56,13 @@ public class minisql extends javax.swing.JFrame{
     }
     private void Btn_analizar(ActionEvent evt){
         GenerarLexer(path);
+        String result = "";
+        Analizador analizador = new Analizador(ruta_SQL);
+        try {
+           result =  analizador.Analizar();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     private void GenerarLexer(String path){
         File lexRules = new File(path);

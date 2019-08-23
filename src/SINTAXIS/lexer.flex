@@ -387,6 +387,7 @@ comment = {comlinea} | {comMlinea}
 "()" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return PARENTESIS;}
 "{}" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return LLAVES;}
 "#" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return NUMERAL;}
+"@" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ARROBA;}
 "##" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return NUMERALES;}
 
 /*                                                               ERROR                                                            */     
