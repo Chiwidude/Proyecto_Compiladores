@@ -12,6 +12,7 @@ public class minisql extends javax.swing.JFrame{
     private JPanel minisqlPanel;
     private JButton btn_rutain;
     private JButton btn_Analizar;
+    private JTextArea showArea;
     private String ruta_SQL;
     private String path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/lexer.flex";
 
@@ -56,10 +57,9 @@ public class minisql extends javax.swing.JFrame{
     }
     private void Btn_analizar(ActionEvent evt){
         GenerarLexer(path);
-        String result = "";
         Analizador analizador = new Analizador(ruta_SQL);
         try {
-           result =  analizador.Analizar();
+           showArea.setText(analizador.Analizar());
         } catch (IOException e) {
             e.printStackTrace();
         }

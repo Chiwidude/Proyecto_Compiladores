@@ -7,13 +7,13 @@ import static SINTAXIS.Token.*;
 %column
 Letra = [a-zA-Z]
 Digito = [0-9]
-Salto = [\r| \n| \r\n]
-Espacio = [ | \t]
+Salto = \r| \n| \r\n
+Espacio = [ \t]
 Empty = {Salto} | {Espacio}
-String = (Letra | Digito | Espacio)*
+String = ({Letra} | {Digito} | {Espacio})*
 /*Comentarios*/
-comlinea = "--" {String}
-comMlinea = "/*" ({String} | {Salto})* ~ "/*"
+comlinea = ("--"){String}
+comMlinea = "/*" {String}| ({Salto})* ~ "*/"
 comment = {comlinea} | {comMlinea}
 /*Variables de la clase Generada*/
 %{
@@ -344,19 +344,15 @@ comment = {comlinea} | {comMlinea}
 "ZONE" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return RESERVADA;}
 "EXCEPTION" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return RESERVADA;}
 
-/*                                                       COMENTARIOS                                                       */
-({comment})+ {/* ignore*/}
-/*                                                         ESPACIOS                                                        */
-({Empty})+ {/* ignore*/}
-/*                                                      IDENTIFICADORES                                                     */
+/*                                                 IDENTIFICADORES                                                     */
 
-({Letra}) ({Letra}|{Digito}| _ )* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return IDENTIFICADOR;}
+({Letra}) ({Letra}|{Digito}| "_" )+ {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return IDENTIFICADOR;}
 
 /*                                                         TIPOS DE DATO                                                    */
 [0 | 1 | NULL] {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_BOOLEANA;}
 ({Digito})+ {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_ENTERA;}
 ({Digito})+ "." ({Digito}) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return CONSTANTE_DECIMAL;}
-"'" {String} "'" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CADENA;}
+("'")({String})("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CADENA;}
 
 /*                                                       OPERADORES,PUNTUACION, OTROS                                         */ 
 "+" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return SUMA;}
@@ -392,4 +388,5 @@ comment = {comlinea} | {comMlinea}
 
 /*                                                               ERROR                                                            */     
   .  {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
+  (".")({Digito}) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
 

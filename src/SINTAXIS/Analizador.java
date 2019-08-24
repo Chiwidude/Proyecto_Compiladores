@@ -17,6 +17,7 @@ public class Analizador {
             Token token = lexer.yylex();
             if(token == null){
                 result.append("FIN LECTURA");
+                GenerarOut(result.toString());
                 return result.toString();
             }
             switch (token){
@@ -32,10 +33,33 @@ public class Analizador {
                     result.append(  lexer.foundLine+ " es un: " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
-
+                case CADENA:
+                    result.append(  lexer.foundLine+ " es una: " + token +" linea:" + lexer.line + " columna inicio: " +
+                            lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    break;
+                case ASIGNACION: case SUMA: case RESTA: case MULTIPLICACION: case DIFERENCIA: case DIVISION: case MOD: case MAYOR: case MAYOR_IGUAL:
+                case MENOR: case MENOR_IGUAL: case IGUALACION: case CONSTANTE_DECIMAL: case AND: case ARROBA: case COMA: case CORCHETEA: case PUNTO_COMA: case CONSTANTE_BOOLEANA:
+                case CONSTANTE_ENTERA: case CORCHETEC: case CORCHETES: case LLAVEC: case PARENTESISC: case EXCLAMACION: case LLAVEA: case LLAVES: case NUMERAL: case NUMERALES:
+                case PARENTESIS: case PARENTESISA: case PUNTO: case OR:
+                    result.append(  lexer.foundLine+ " es un símbolo de : " + token +" linea:" + lexer.line + " columna inicio: " +
+                            lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    break;
             }
+
         }
 
 
+    }
+    private void GenerarOut(String result){
+        String newpath = path;
+        newpath = newpath.replace(".sql",".out");
+        File out = new File(newpath);
+        try {
+            FileWriter fileWriter = new FileWriter(out);
+            fileWriter.write(result);
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
