@@ -22,7 +22,18 @@ public class Analizador {
             }
             switch (token){
                 case ERROR:
-                    result.append( token + ": " + lexer.foundLine + " Regla no definida linea: " + lexer.line + " columna inicio: " +
+                    if(lexer.foundLine.contains("'")){
+                        result.append( token + ": " + lexer.foundLine + " Cadena mal definida linea: " + lexer.line + " columna inicio: " +
+                                lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    }else
+                        {
+                            result.append( token + ": " + lexer.foundLine + " Regla no definida linea: " + lexer.line + " columna inicio: " +
+                                    lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                        }
+
+                    break;
+                case ERROR_DECIMAL:
+                    result.append( token + ": " + lexer.foundLine + " número decimal mal escrito linea: " + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
                 case RESERVADA:
@@ -30,8 +41,14 @@ public class Analizador {
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
                 case IDENTIFICADOR:
-                    result.append(  lexer.foundLine+ " es un: " + token +" linea:" + lexer.line + " columna inicio: " +
-                            lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    if(lexer.foundLine.length() <= 31) {
+                        result.append(lexer.foundLine + " es un: " + token + " linea:" + lexer.line + " columna inicio: " +
+                                lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    } else{
+                        result.append(lexer.foundLine + " excede la longitud máxima del identificador,31. El identificador válido sería: "  +
+                                lexer.foundLine.substring(0,31)+ " linea: " + lexer.line + " columna inicio: " +
+                                lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    }
                     break;
                 case CADENA:
                     result.append(  lexer.foundLine+ " es una: " + token +" linea:" + lexer.line + " columna inicio: " +
@@ -51,9 +68,8 @@ public class Analizador {
 
     }
     private void GenerarOut(String result){
-        String newpath = path;
-        newpath = newpath.replace(".sql",".out");
-        File out = new File(newpath);
+        StringBuilder newpath = new StringBuilder(path.replace(".sql",".out"));
+        File out = new File(newpath.toString());
         try {
             FileWriter fileWriter = new FileWriter(out);
             fileWriter.write(result);

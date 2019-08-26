@@ -38,5 +38,6 @@ public enum Token {
         ARROBA,
         NUMERAL,
         NUMERALES,
-        ERROR
+        ERROR,
+        ERROR_DECIMAL
 }

@@ -10,11 +10,12 @@ Digito = [0-9]
 Salto = \r| \n| \r\n
 Espacio = [ \t]
 Empty = {Salto} | {Espacio}
-String = ({Letra} | {Digito} | {Espacio})*
+String = ({Letra} | {Digito} | {Espacio} |{operadores})*
 /*Comentarios*/
 comlinea = ("--"){String}
-comMlinea = "/*" {String}| ({Salto})* ~ "*/"
+comMlinea = ("/*") {String}| ({Salto})* ("*/")
 comment = {comlinea} | {comMlinea}
+operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|("!=")|("&&")|("||")|("!")|(";")|(",")|(".")|("[")|("]")|("(")|(")")|("{")|("}")|("[]")|("()")|("{}")|("@")|("#")|("##")
 /*Variables de la clase Generada*/
 %{
   public String foundLine;
@@ -351,7 +352,7 @@ comment = {comlinea} | {comMlinea}
 /*                                                         TIPOS DE DATO                                                    */
 [0 | 1 | NULL] {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_BOOLEANA;}
 ({Digito})+ {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_ENTERA;}
-({Digito})+ "." ({Digito}) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return CONSTANTE_DECIMAL;}
+({Digito})+ "." ({Digito}+) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return CONSTANTE_DECIMAL;}
 ("'")({String})("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CADENA;}
 
 /*                                                       OPERADORES,PUNTUACION, OTROS                                         */ 
@@ -388,5 +389,7 @@ comment = {comlinea} | {comMlinea}
 
 /*                                                               ERROR                                                            */     
   .  {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
-  (".")({Digito}) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
-
+  (".")({Digito}+)([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR_DECIMAL;}
+  ("/*")({Letra} | {Digito} |{operadores})* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
+  ({String})("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return ERROR;}
+  ("'")({String}) {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return ERROR;}
