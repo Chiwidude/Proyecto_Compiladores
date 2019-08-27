@@ -352,7 +352,7 @@ operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|
 /*                                                         TIPOS DE DATO                                                    */
 [0 | 1 | NULL] {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_BOOLEANA;}
 ({Digito})+ {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_ENTERA;}
-({Digito})+ "." ({Digito}+) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return CONSTANTE_DECIMAL;}
+({Digito})+ "." ({Digito}*) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return CONSTANTE_DECIMAL;}
 ("'")({String})("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CADENA;}
 
 /*                                                       OPERADORES,PUNTUACION, OTROS                                         */ 

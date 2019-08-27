@@ -53,6 +53,7 @@ public class minisql extends javax.swing.JFrame{
             File selectFile = jfc.getSelectedFile();
             ruta_SQL = selectFile.getPath();
             btn_Analizar.setEnabled(true);
+            showArea.setText("");
         }
     }
     private void Btn_analizar(ActionEvent evt){
@@ -60,6 +61,7 @@ public class minisql extends javax.swing.JFrame{
         Analizador analizador = new Analizador(ruta_SQL);
         try {
            showArea.setText(analizador.Analizar());
+           btn_Analizar.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
