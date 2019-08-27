@@ -23,15 +23,15 @@ public class Analizador {
             switch (token){
                 case ERROR:
                     if(lexer.foundLine.contains("'")){
-                        result.append( token + ": " + lexer.foundLine + " Cadena mal definida linea: " + lexer.line + " columna inicio: " +
+                        result.append( token + ": " + lexer.foundLine + " <- Cadena mal definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     }else if(lexer.foundLine.contains(("/*")))
                         {
-                            result.append( token + ": " + lexer.foundLine + " comentario multilinea */ faltante linea: " + lexer.line + " columna inicio: " +
+                            result.append( token + ": " + lexer.foundLine + " <- Comentario con */ faltante linea: " + lexer.line + " columna inicio: " +
                                     lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                         }
                     else{
-                        result.append( token + ": " + lexer.foundLine + " Regla no definida linea: " + lexer.line + " columna inicio: " +
+                        result.append( token + ": " + lexer.foundLine + " <- Regla no definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     }
 
