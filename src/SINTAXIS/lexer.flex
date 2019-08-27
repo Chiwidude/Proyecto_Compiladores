@@ -13,7 +13,7 @@ Empty = {Salto} | {Espacio}
 String = ({Letra} | {Digito} | {Espacio} |{operadores})*
 /*Comentarios*/
 comlinea = ("--"){String}
-comMlinea = ("/*") {String}| ({Salto})* ("*/")
+comMlinea = "/*" ~ "*/"
 comment = {comlinea} | {comMlinea}
 operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|("!=")|("&&")|("||")|("!")|(";")|(",")|(".")|("[")|("]")|("(")|(")")|("{")|("}")|("[]")|("()")|("{}")|("@")|("#")|("##")
 /*Variables de la clase Generada*/
@@ -25,8 +25,8 @@ operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|
 %}
 %%
 /*Ignored*/
-{Empty} {/*Ignore*/}
-{comment} {/*Ignore*/}
+{Empty}+ {/*Ignore*/}
+{comment}+ {/*Ignore*/}
 
 /*------------------------------------------------------------RESERVADAS-------------------------------------------------*/
 "ADD" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return RESERVADA;}
@@ -389,7 +389,5 @@ operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|
 
 /*                                                               ERROR                                                            */     
   .  {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
-  (".")({Digito}+)([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR_DECIMAL;}
-  ("/*")({Letra} | {Digito} |{operadores})* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
-  ({String})("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return ERROR;}
-  ("'")({String}) {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return ERROR;}
+  ("/*") {String} {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}
+  ("'") {String} {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return ERROR;}

@@ -25,11 +25,15 @@ public class Analizador {
                     if(lexer.foundLine.contains("'")){
                         result.append( token + ": " + lexer.foundLine + " Cadena mal definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                    }else
+                    }else if(lexer.foundLine.contains(("/*")))
                         {
-                            result.append( token + ": " + lexer.foundLine + " Regla no definida linea: " + lexer.line + " columna inicio: " +
+                            result.append( token + ": " + lexer.foundLine + " comentario multilinea */ faltante linea: " + lexer.line + " columna inicio: " +
                                     lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                         }
+                    else{
+                        result.append( token + ": " + lexer.foundLine + " Regla no definida linea: " + lexer.line + " columna inicio: " +
+                                lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    }
 
                     break;
                 case ERROR_DECIMAL:
