@@ -40,10 +40,6 @@ public class Analizador {
                     result.append( token + ": " + lexer.foundLine + " número decimal mal escrito linea: " + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
-                case RESERVADA:
-                    result.append(  lexer.foundLine+ " es una palabra: " + token +" linea:" + lexer.line + " columna inicio: " +
-                            lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                    break;
                 case IDENTIFICADOR:
                     if(lexer.foundLine.length() <= 31) {
                         result.append(lexer.foundLine + " es un: " + token + " linea:" + lexer.line + " columna inicio: " +
@@ -63,6 +59,10 @@ public class Analizador {
                 case CONSTANTE_ENTERA: case CORCHETEC: case CORCHETES: case LLAVEC: case PARENTESISC: case EXCLAMACION: case LLAVEA: case LLAVES: case NUMERAL: case NUMERALES:
                 case PARENTESIS: case PARENTESISA: case PUNTO: case OR:
                     result.append(  lexer.foundLine+ " es un símbolo de : " + token +" linea:" + lexer.line + " columna inicio: " +
+                            lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    break;
+                    default:
+                    result.append(  lexer.foundLine+ " palabra reservada: " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
             }
