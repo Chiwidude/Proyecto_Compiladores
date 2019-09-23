@@ -1,11 +1,14 @@
 package SINTAXIS;
 import java.io.File;
 import java.io.*;
+import java.util.ArrayList;
 
 public class Analizador {
     public String path;
+    private ArrayList<TKEN> TOKENS;
     public Analizador(String path){
         this.path = path;
+        this.TOKENS = new ArrayList<>();
     }
 
     public String Analizar() throws IOException {
@@ -44,15 +47,18 @@ public class Analizador {
                     if(lexer.foundLine.length() <= 31) {
                         result.append(lexer.foundLine + " es un: " + token + " linea:" + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                        TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     } else{
                         result.append(lexer.foundLine + " excede la longitud máxima del identificador,31. El identificador válido sería: "  +
                                 lexer.foundLine.substring(0,31)+ " linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     }
+
                     break;
                 case CADENA:
                     result.append(  lexer.foundLine+ " es una: " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     break;
                 case ASIGNACION: case SUMA: case RESTA: case MULTIPLICACION: case DIFERENCIA: case DIVISION: case MOD: case MAYOR: case MAYOR_IGUAL:
                 case MENOR: case MENOR_IGUAL: case IGUALACION: case CONSTANTE_DECIMAL: case AND: case ARROBA: case COMA: case CORCHETEA: case PUNTO_COMA: case CONSTANTE_BOOLEANA:
@@ -60,10 +66,12 @@ public class Analizador {
                 case PARENTESIS: case PARENTESISA: case PUNTO: case OR:
                     result.append(  lexer.foundLine+ " es un símbolo de : " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     break;
                     default:
                     result.append(  lexer.foundLine+ " palabra reservada: " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     break;
             }
 
