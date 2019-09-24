@@ -1,14 +1,15 @@
 package SINTAXIS;
 import java.io.File;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Analizador {
     public String path;
-    private ArrayList<TKEN> TOKENS;
+    private Queue<TKEN> TOKENS;
     public Analizador(String path){
         this.path = path;
-        this.TOKENS = new ArrayList<>();
+        this.TOKENS = new LinkedList<>();
     }
 
     public String Analizar() throws IOException {
@@ -90,4 +91,33 @@ public class Analizador {
             e.printStackTrace();
         }
     }
+
+    public void Sintaxis(){
+        TKEN temp = new TKEN(null," ",0,0 ,0);
+        Queue<TKEN> query = new LinkedList<>();
+        while(!TOKENS.isEmpty()){
+            temp = TOKENS.remove();
+            while ((!temp.getValue().trim().equals(";") || !temp.getValue().trim().equals("GO")) && !TOKENS.isEmpty()){
+                query.add(temp);
+                temp = TOKENS.remove();
+            }
+            if (temp.getValue().trim().equals(";")){
+                query.add(temp);
+                if (TOKENS.peek().getValue().trim().equals("GO")){
+                    query.add(TOKENS.remove());
+                }
+            }else if (temp.getValue().trim().equals("GO")){
+                query.add(temp);
+            }
+            AnalisisSintactico(query);
+            query.clear();
+        }
+    }
+
+    private void AnalisisSintactico(Queue<TKEN> query){
+
+    }
+
+
+
 }
