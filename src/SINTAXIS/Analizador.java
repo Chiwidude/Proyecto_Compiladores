@@ -1,4 +1,5 @@
 package SINTAXIS;
+import javax.print.DocFlavor;
 import java.io.File;
 import java.io.*;
 import java.util.LinkedList;
@@ -7,6 +8,7 @@ import java.util.Queue;
 public class Analizador {
     public String path;
     private Queue<TKEN> TOKENS;
+    public TKEN lookAhead;
     public Analizador(String path){
         this.path = path;
         this.TOKENS = new LinkedList<>();
@@ -93,30 +95,95 @@ public class Analizador {
     }
 
     public void Sintaxis(){
-        TKEN temp = new TKEN(null," ",0,0 ,0);
-        Queue<TKEN> query = new LinkedList<>();
-        while(!TOKENS.isEmpty()){
-            temp = TOKENS.remove();
-            while ((!temp.getValue().trim().equals(";") || !temp.getValue().trim().equals("GO")) && !TOKENS.isEmpty()){
-                query.add(temp);
-                temp = TOKENS.remove();
-            }
-            if (temp.getValue().trim().equals(";")){
-                query.add(temp);
-                if (TOKENS.peek().getValue().trim().equals("GO")){
-                    query.add(TOKENS.remove());
-                }
-            }else if (temp.getValue().trim().equals("GO")){
-                query.add(temp);
-            }
-            AnalisisSintactico(query);
-            query.clear();
+
+        AnalisisSintactico();
+    }
+
+    private void AnalisisSintactico(){
+            lookAhead = TOKENS.remove();
+            Inicial();
+    }
+
+    private void Inicial(){
+        if (lookAhead.getValue().trim().equals("SELECT") ||lookAhead.getValue().trim().equals("INSERT")||lookAhead.getValue().trim().equals("DELETE")||lookAhead.getValue().trim().equals("UPDATE")||
+                lookAhead.getValue().trim().equals("CREATE")||lookAhead.getValue().trim().equals("ALTER")||lookAhead.getValue().trim().equals("DROP")||lookAhead.getValue().trim().equals("TRUNCATE")){
+                    INICIAL_A();
+                    FINAL();
+        }else{
+                raiseError(lookAhead);
         }
     }
-
-    private void AnalisisSintactico(Queue<TKEN> query){
+    private final void MATCH(String Esperado){
+        if (lookAhead.getValue().trim().equals(Esperado)){
+            lookAhead = TOKENS.remove();
+        }else{
+            raiseError(Esperado);
+        }
 
     }
+    private void INICIAL_A (){
+        if(lookAhead.getValue().trim().equals("SELECT")){
+            SELECT();
+        }else if(lookAhead.getValue().trim().equals("DELETE")){
+            DELETE();
+        }else if(lookAhead.getValue().trim().equals("UPDATE")){
+            UPDATE();
+        } else if(lookAhead.getValue().trim().equals("INSERT")){
+            INSERT();
+        } else if(lookAhead.getValue().trim().equals("DROP")){
+            DROP();
+        } else if(lookAhead.getValue().trim().equals("TRUNCATE")){
+            TRUNCATE();
+        }else if(lookAhead.getValue().trim().equals("CREATE")){
+            CREATE();
+        } else if(lookAhead.getValue().trim().equals("ALTER")){
+            ALTER();
+        }else raiseError(lookAhead);
+    }
+    private void FINAL(){
+        if(lookAhead.getValue().trim().equals(";")){
+            MATCH(";");
+            FINAL_A();
+        }else{
+            raiseError(lookAhead);
+        }
+    }
+    private void FINAL_A(){
+        if (lookAhead.getValue().trim().equals("GO")){
+                MATCH("GO");
+        }
+    }
+    public void raiseError(Object error){
+
+    }
+    private void SELECT(){
+        MATCH("SELECT");
+    }
+    private void DELETE(){
+        MATCH("DELETE");
+    }
+    private void INSERT(){
+        MATCH("INSERT");
+    }
+    private void UPDATE(){
+        MATCH("UPDATE");
+    }
+    private void DROP(){
+        MATCH("DROP");
+    }
+    private void CREATE(){
+        MATCH("CREATE");
+    }
+    private void ALTER(){
+        MATCH("ALTER");
+    }
+    private void TRUNCATE(){
+        MATCH("TRUNCATE");
+    }
+
+
+
+
 
 
 
