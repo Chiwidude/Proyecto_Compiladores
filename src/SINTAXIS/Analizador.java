@@ -215,7 +215,7 @@ public class Analizador {
         if(lookAhead.getName().equals(Token.ORDER)){
             MATCH(Token.ORDER);
             MATCH(Token.BY);
-            Object_4();
+            ExpresionE();
             ORDER_A();
             ORDER_B();
             ORDER_C();
@@ -235,8 +235,12 @@ public class Analizador {
         }
     }
     private void ORDER_C(){
-        if(lookAhead.getName().equals(Token.IDENTIFICADOR)||lookAhead.getName().equals(Token.CORCHETEA)){
-            Object_4();
+        if(lookAhead.getName().equals(Token.IDENTIFICADOR)|| lookAhead.getName().equals(Token.CORCHETEA) || lookAhead.getName().equals(Token.CONSTANTE_BOOLEANA)
+                || lookAhead.getName().equals(Token.CONSTANTE_ENTERA) || lookAhead.getName().equals(Token.CONSTANTE_DECIMAL)
+                || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals(Token.ARROBA)
+                ||lookAhead.getName().equals(Token.AVG) || lookAhead.getName().equals(Token.COUNT) || lookAhead.getName().equals(Token.MIN)
+                || lookAhead.getName().equals(Token.MAX) || lookAhead.getName().equals( Token.SUM)){
+            ExpresionE();
             ORDER_A();
             ORDER_B();
         }
@@ -434,18 +438,40 @@ public class Analizador {
         }
     }
     private void INSERT_EXPRESION(){
-        if(lookAhead.getName().equals(Token.DEFAULT)||lookAhead.getName().equals(Token.IDENTIFICADOR) || lookAhead.getName().equals(Token.CORCHETEA) || lookAhead.getName().equals(Token.CONSTANTE_BOOLEANA)
+        if(lookAhead.getName().equals(Token.DEFAULT)|| lookAhead.getName().equals(Token.CONSTANTE_BOOLEANA)
                 || lookAhead.getName().equals(Token.CONSTANTE_ENTERA) || lookAhead.getName().equals(Token.CONSTANTE_DECIMAL)
-                || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals(Token.ARROBA)|| lookAhead.getName().equals(Token.PARENTESISA)||
+                || lookAhead.getName().equals(Token.CADENA)||
                 lookAhead.getName().equals(Token.NULL)){
-            UPDATE_B();
+            INSERT_EXPRESION_A();
             INSERT_EXPRESION_B();
         }else raiseError(lookAhead);
+    }
+    private void INSERT_EXPRESION_A(){
+        switch (lookAhead.getName()){
+            case DEFAULT:
+                MATCH(Token.DEFAULT);
+                break;
+            case CONSTANTE_BOOLEANA:
+                MATCH(Token.CONSTANTE_BOOLEANA);
+                break;
+            case CONSTANTE_ENTERA:
+                MATCH(Token.CONSTANTE_ENTERA);
+                break;
+            case CONSTANTE_DECIMAL:
+                MATCH(Token.CONSTANTE_DECIMAL);
+                break;
+            case CADENA:
+                MATCH(Token.CADENA);
+                break;
+            case NULL:
+                MATCH(Token.NULL);
+                break;
+        }
     }
     private void INSERT_EXPRESION_B(){
         if(lookAhead.getName().equals(Token.COMA)){
             MATCH(Token.COMA);
-            UPDATE_B();
+            INSERT_EXPRESION_A();
             INSERT_EXPRESION_B();
         }
     }
@@ -458,7 +484,7 @@ public class Analizador {
         MATCH(Token.SET);
         UPDATE_A();
         FROM_UPDATE();
-        //WHERE();
+        WHERE();
     }
     private void UPDATE_A(){
         if(lookAhead.getName().equals(Token.IDENTIFICADOR)||lookAhead.getName().equals(Token.CORCHETEA)){
@@ -477,11 +503,11 @@ public class Analizador {
                 || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals(Token.ARROBA)|| lookAhead.getName().equals(Token.PARENTESISA)||
                 lookAhead.getName().equals(Token.NULL)){
             Expresion();
-        }
+        }else raiseError(lookAhead);
     }
     private void UPDATE_C(){
-        if(lookAhead.getName().equals(Token.PUNTO)){
-            MATCH(Token.PUNTO);
+        if(lookAhead.getName().equals(Token.COMA)){
+            MATCH(Token.COMA);
             UPDATE_A();
             UPDATE_C();
         }
@@ -491,7 +517,7 @@ public class Analizador {
             MATCH(Token.FROM);
             Object_3();
             DELETE_C();
-        }
+        }else raiseError(lookAhead);
     }
     //endregion
     //region DROP
@@ -573,10 +599,11 @@ public class Analizador {
           ID();
           MATCH(Token.ON);
           Object_3();
-      }
+      }else raiseError(lookAhead);
     }
     private void DROP_INDEX_B(){
-        if(lookAhead.getName().equals(Token.PUNTO_COMA)){
+        if(lookAhead.getName().equals(Token.COMA)){
+            MATCH(Token.COMA);
             DROP_INDEX_A();
             DROP_INDEX_B();
         }
@@ -585,6 +612,98 @@ public class Analizador {
     //region CREATE
     private void CREATE(){
         MATCH(Token.CREATE);
+        CREATE_A();
+    }
+    private void CREATE_A(){
+      switch (lookAhead.getName()){
+          case USER:
+              CREATE_USER();
+              break;
+          case INDEX:
+              CREATE_INDEX();
+              break;
+          case DATABASE:
+              CREATE_DATABASE();
+              break;
+          case TABLE:
+              CREATE_TABLE();
+              break;
+          case VIEW:
+              CREATE_VIEW();
+              break;
+          default:
+              raiseError(lookAhead);
+              break;
+      }
+    }
+    private void CREATE_TABLE(){
+
+    }
+    private void CREATE_DATABASE(){
+        MATCH(Token.DATABASE);
+        ID();
+        CREATE_DATABASE_A();
+
+    }
+    private void CREATE_DATABASE_A(){
+        if(lookAhead.getName().equals(Token.COLLATE)){
+                MATCH(Token.COLLATE);
+                ID();
+        }
+    }
+    private void CREATE_INDEX(){
+        CREATE_INDEX_A();
+        //COLUMN_CONSTR_C();
+        MATCH(Token.INDEX);
+        ID();
+        MATCH(Token.ON);
+        Object_3();
+        COLUMN_INDEX();
+        INCLUDE_INDEX();
+        WHERE();
+    }
+    private void CREATE_INDEX_A(){
+        if(lookAhead.getName().equals(Token.UNIQUE)){
+            MATCH(Token.UNIQUE);
+        }
+    }
+    private void COLUMN_INDEX(){
+        if(lookAhead.getName().equals(Token.PARENTESISA)){
+            MATCH(Token.PARENTESISA);
+            COLUMN_INDEX_A();
+            MATCH(Token.PARENTESISC);
+        }else raiseError(lookAhead);
+    }
+    private void COLUMN_INDEX_A(){
+        if(lookAhead.getName().equals(Token.IDENTIFICADOR)||lookAhead.getName().equals(Token.CORCHETEA)){
+            ID();
+            ORDER_B();
+            COLUMN_INDEX_B();
+        }else raiseError(lookAhead);
+    }
+    private void COLUMN_INDEX_B(){
+        if(lookAhead.getName().equals(Token.COMA)){
+            MATCH(Token.COMA);
+            ID();
+            ORDER_B();
+            COLUMN_INDEX_B();
+        }
+    }
+    private void INCLUDE_INDEX(){
+        if(lookAhead.getName().equals(Token.INCLUDE)){
+            MATCH(Token.INCLUDE);
+            COLUMN_LIST();
+        }
+    }
+    private void CREATE_USER(){
+        MATCH(Token.USER);
+        MATCH(Token.IDENTIFICADOR);
+    }
+    private void CREATE_VIEW(){
+        MATCH(Token.VIEW);
+        Object_2();
+        MATCH(Token.AS);
+        SELECT();
     }
     //endregion
     //region ALTER
@@ -679,30 +798,37 @@ public class Analizador {
     }
     private void ALTER_TABLE_DROP(){
         MATCH(Token.DROP);
-        ALTER_TABLE_DROP_C();
-        IF_EXISTS();
-        //INSERT_COLUMN_LIST_A();
         ALTER_TABLE_DROP_A();
+        ALTER_TABLE_DROP_C();
     }
     private void ALTER_TABLE_DROP_A(){
-        if(lookAhead.getName().equals(Token.COMA)){
-            MATCH(Token.COMA);
-            ALTER_TABLE_DROP_C();
+        if(lookAhead.getName().equals(Token.CONSTRAINT)|| lookAhead.getName().equals(Token.IF)){
+            ALTER_TABLE_DROP_B();
             IF_EXISTS();
-            //INSERT_COLUMN_LIST_A();
-            ALTER_TABLE_DROP_A();
+            ID();
+        }else if (lookAhead.getName().equals(Token.COLUMN)){
+            MATCH(Token.COLUMN);
+            IF_EXISTS();
+            ID();
+        }else raiseError(lookAhead);
+    }
+    private void ALTER_TABLE_DROP_B(){
+        if(lookAhead.getName().equals(Token.CONSTRAINT)){
+            MATCH(Token.CONSTRAINT);
         }
     }
     private void ALTER_TABLE_DROP_C(){
-        if(lookAhead.getName().equals(Token.CONSTRAINT)){
-                ALTER_TABLE_DROP_D();
-        }else if(lookAhead.getName().equals(Token.COLUMN)){
-            MATCH(Token.COLUMN);
-        }else raiseError(lookAhead);
+       if(lookAhead.getName().equals(Token.COMA)){
+           MATCH(Token.COMA);
+           ALTER_TABLE_DROP_D();
+           ALTER_TABLE_DROP_C();
+       }
     }
     private void ALTER_TABLE_DROP_D(){
-        if(lookAhead.getName().equals(Token.CONSTRAINT)){
-            MATCH(Token.CONSTRAINT);
+        if(lookAhead.getName().equals(Token.IDENTIFICADOR)||lookAhead.getName().equals(Token.CORCHETEA)){
+            ID();
+        }else if(lookAhead.getName().equals(Token.COLUMN)|| lookAhead.getName().equals(Token.CONSTRAINT)||lookAhead.getName().equals(Token.IF)){
+            ALTER_TABLE_DROP_A();
         }
     }
     private void ALTER_USER(){
@@ -794,12 +920,8 @@ public class Analizador {
         }
     }
     private void ALIAS_A(){
-        if(lookAhead.getName().equals(Token.IDENTIFICADOR)){
-            MATCH(Token.IDENTIFICADOR);
-        }else if(lookAhead.getName().equals(Token.CORCHETEA)){
-            MATCH(Token.CORCHETEA);
-            MATCH(Token.IDENTIFICADOR);
-            MATCH(Token.CORCHETEC);
+        if(lookAhead.getName().equals(Token.IDENTIFICADOR)||lookAhead.getName().equals(Token.CORCHETEA)){
+            ID();
         }else if(lookAhead.getName().equals(Token.CADENA)){
             MATCH(Token.CADENA);
         }else raiseError(lookAhead);
@@ -855,9 +977,6 @@ public class Analizador {
             MATCH(Token.MULTIPLICACION);
             ExpresionD();
             ExpresionC();
-
-
-
         }else if (lookAhead.getName().equals(Token.DIVISION)) {
             MATCH(Token.DIVISION);
             ExpresionD();
@@ -874,6 +993,7 @@ public class Analizador {
         }else if (lookAhead.getName().equals(Token.PARENTESISA)) {
             MATCH(Token.PARENTESISA);
             Expresion();
+            PredicadoB();
             MATCH(Token.PARENTESISC);
         }else{
             raiseError(lookAhead);
@@ -904,6 +1024,7 @@ public class Analizador {
                         MATCH(Token.SUM);
                         break;
                 }
+                MATCH(Token.PARENTESISA);
                 Expresion_F();
         }
     }
@@ -911,7 +1032,10 @@ public class Analizador {
         if(lookAhead.getName().equals(Token.IDENTIFICADOR)|| lookAhead.getName().equals(Token.CORCHETEA)){
             Object_4();
             MATCH(Token.PARENTESISC);
-        }
+        }else if(lookAhead.getName().equals(Token.CONSTANTE_ENTERA)){
+            MATCH(Token.CONSTANTE_ENTERA);
+            MATCH(Token.PARENTESISC);
+        }else raiseError(lookAhead);
     }
     private void NOT(){
         if (lookAhead.getName().equals(Token.NOT)) {
@@ -1116,6 +1240,7 @@ public class Analizador {
         || lookAhead.getName().equals(Token.DECIMAL) || lookAhead.getName().equals(Token.SMALLINT) || lookAhead.getName().equals(Token.NUMERIC)){
             TIPO_DATO_A();
         } else if(lookAhead.getName().equals(Token.CORCHETEA)){
+            MATCH(Token.CORCHETEA);
             TIPO_DATO_A();
             MATCH(Token.CORCHETEC);
         }
