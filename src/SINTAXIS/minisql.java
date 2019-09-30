@@ -61,6 +61,8 @@ public class minisql extends javax.swing.JFrame{
         Analizador analizador = new Analizador(ruta_SQL);
         try {
            showArea.setText(analizador.Analizar());
+           analizador.Sintaxis();
+           JOptionPane.showMessageDialog(null,"ARCHIVO SINTACTICAMENTE CORRECTO");
            btn_Analizar.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
