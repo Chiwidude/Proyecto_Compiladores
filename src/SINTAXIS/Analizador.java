@@ -166,6 +166,7 @@ public class Analizador {
     public String returnError(){
         String[] lines = errors.toString().split(System.lineSeparator());
         StringBuilder strc = new StringBuilder();
+    if(!errors.toString().isEmpty()){
         for(String line : lines){
             if(line.length()>150){
                 String temp = line.substring(0,150);
@@ -182,6 +183,11 @@ public class Analizador {
                 strc.append(System.lineSeparator());
             }
         }
+    }   else{
+        strc.append(errors.toString());
+    }
+
+
         return strc.toString();
     }
     private void INITIAL(){
@@ -189,7 +195,7 @@ public class Analizador {
                 lookAhead.getName().equals(Token.CREATE)||lookAhead.getName().equals(Token.ALTER)||lookAhead.getName().equals(Token.DROP)||lookAhead.getName().equals(Token.TRUNCATE)){
                     INICIAL_A();
                     FINAL();
-        }else if(lookAhead.getName().equals(Token.PUNTO_COMA)&& flag) {
+        }else if((lookAhead.getName().equals(Token.PUNTO_COMA)||lookAhead.getName().equals(Token.GO))&& flag) {
             MATCH(Token.PUNTO_COMA);
             flag = false;
         }else{
@@ -763,8 +769,8 @@ public class Analizador {
         DROP_TABLE_A();
     }
     private void DROP_TABLE_A(){
-        if(lookAhead.getName().equals(Token.PUNTO_COMA)){
-            MATCH(Token.PUNTO_COMA);
+        if(lookAhead.getName().equals(Token.COMA)){
+            MATCH(Token.COMA);
             Object_3();
             DROP_TABLE_A();
         }
