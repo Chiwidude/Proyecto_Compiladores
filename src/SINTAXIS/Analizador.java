@@ -1,15 +1,7 @@
 package SINTAXIS;
-import com.sun.source.tree.ArrayTypeTree;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.prefs.NodeChangeEvent;
-import java.util.regex.Matcher;
-import java.util.zip.CheckedInputStream;
+import java.util.*;
 
 public class Analizador {
     public String path;
@@ -26,12 +18,49 @@ public class Analizador {
 
     //region LÉXICO
     public String Analizar() throws IOException {
+        boolean go = false;
+        Stack<TKEN> temp = new Stack<>();
+        Stack<TKEN> temp1 = new Stack<>();
         Reader reader   = new BufferedReader(new FileReader(this.path));
         Lexer lexer = new Lexer(reader);
         StringBuilder result = new StringBuilder();
-
         while(true){
             Token token = lexer.yylex();
+            if(!temp.isEmpty()){
+                if(temp.peek().getName().equals(Token.PUNTO_COMA)||temp.peek().getName().equals(Token.GO)){
+                    if(token != null){
+                        if(token.equals(Token.GO)){
+                            go = true;
+                            temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                        }
+                    }
+
+                        boolean found = false;
+                        while(!temp.isEmpty()&&!found){
+                            TKEN tmp = temp.pop();
+                            if(tmp.getName().equals(Token.ERROR)||tmp.getName().equals(Token.ERROR_DECIMAL)){
+                                found = true;
+                            }else if(tmp.getName().equals(Token.IDENTIFICADOR)){
+                                if(tmp.getValue().trim().equals("ERROR_CADENA")){
+                                    found = true;
+                                }else{
+                                    temp1.push(tmp);
+                                }
+                            }else{
+                                temp1.push(tmp);
+                            }
+                        }
+                        if(!found){
+                            while(!temp1.isEmpty()){
+                                TOKENS.add(temp1.pop());
+                            }
+                        }else{
+                            temp.clear();
+                            temp1.clear();
+                        }
+
+                }
+            }
             if(token == null){
                 result.append("FIN LECTURA");
                 GenerarOut(result.toString());
@@ -42,37 +71,42 @@ public class Analizador {
                     if(lexer.foundLine.contains("'")){
                         result.append( token + ": " + lexer.foundLine + " <- Cadena mal definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                        temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     }else if(lexer.foundLine.contains(("/*")))
                         {
                             result.append( token + ": " + lexer.foundLine + " <- Comentario con */ faltante linea: " + lexer.line + " columna inicio: " +
                                     lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                            temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                         }
                     else{
                         result.append( token + ": " + lexer.foundLine + " <- Regla no definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                        temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     }
 
                     break;
                 case ERROR_DECIMAL:
                     result.append( token + ": " + lexer.foundLine + " número decimal mal escrito linea: " + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     break;
                 case IDENTIFICADOR:
                     if(lexer.foundLine.length() <= 31) {
                         result.append(lexer.foundLine + " es un: " + token + " linea:" + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                        TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                        temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     } else{
                         result.append(lexer.foundLine + " excede la longitud máxima del identificador,31. El identificador válido sería: "  +
                                 lexer.foundLine.substring(0,31)+ " linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                        temp.push(new TKEN(token,"ERROR_CADENA", lexer.columnSt,lexer.columnNd,lexer.line));
                     }
 
                     break;
                 case CADENA:
                     result.append(  lexer.foundLine+ " es una: " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                    TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                    temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     break;
                 case ASIGNACION: case SUMA: case RESTA: case MULTIPLICACION: case DIFERENCIA: case DIVISION: case MOD: case MAYOR: case MAYOR_IGUAL:
                 case MENOR: case MENOR_IGUAL: case IGUALACION: case CONSTANTE_DECIMAL: case AND: case ARROBA: case COMA: case CORCHETEA: case PUNTO_COMA: case CONSTANTE_BOOLEANA:
@@ -80,12 +114,25 @@ public class Analizador {
                 case PARENTESIS: case PARENTESISA: case PUNTO: case OR:
                     result.append(  lexer.foundLine+ " es un símbolo de : " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                    TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                    temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
                     break;
                     default:
-                    result.append(  lexer.foundLine+ " palabra reservada: " + token +" linea:" + lexer.line + " columna inicio: " +
-                            lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                    TOKENS.add(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                        if(token.equals(Token.GO)){
+                            if(go){
+                                go = false;
+                                result.append(  lexer.foundLine+ " palabra reservada: " + token +" linea:" + lexer.line + " columna inicio: " +
+                                        lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                            }else{
+                                result.append(  lexer.foundLine+ " palabra reservada: " + token +" linea:" + lexer.line + " columna inicio: " +
+                                        lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                                temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                            }
+                        }else{
+                            result.append(  lexer.foundLine+ " palabra reservada: " + token +" linea:" + lexer.line + " columna inicio: " +
+                                    lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                            temp.push(new TKEN(token,lexer.foundLine, lexer.columnSt,lexer.columnNd,lexer.line));
+                        }
+
                     break;
             }
 
@@ -116,11 +163,17 @@ public class Analizador {
           }
 
     }
+    public String returnError(){
+        return errors.toString();
+    }
     private void INITIAL(){
         if (lookAhead.getName().equals(Token.SELECT) ||lookAhead.getName().equals(Token.INSERT)||lookAhead.getName().equals(Token.DELETE)||lookAhead.getName().equals(Token.UPDATE)||
                 lookAhead.getName().equals(Token.CREATE)||lookAhead.getName().equals(Token.ALTER)||lookAhead.getName().equals(Token.DROP)||lookAhead.getName().equals(Token.TRUNCATE)){
                     INICIAL_A();
                     FINAL();
+        }else if(lookAhead.getName().equals(Token.PUNTO_COMA)&& flag) {
+            MATCH(Token.PUNTO_COMA);
+            flag = false;
         }else{
                 List<Object> errors = new LinkedList<>();
                 errors.add(lookAhead);
@@ -138,7 +191,7 @@ public class Analizador {
     }
     private final void MATCH(Token Expected){
         if (lookAhead.getName().equals(Expected)){
-            lookAhead = TOKENS.remove();
+            lookAhead = TOKENS.poll();
         }else{
             List<Object> errors = new LinkedList<>();
             errors.add(lookAhead);
@@ -182,8 +235,10 @@ public class Analizador {
         if(lookAhead.getName().equals(Token.PUNTO_COMA)){
             MATCH(Token.PUNTO_COMA);
             FINAL_A();
+            flag = false;
         }else if(lookAhead.getName().equals(Token.GO)) {
             MATCH(Token.GO);
+            flag = false;
         }
           else {
             List<Object> errors = new LinkedList<>();
@@ -194,9 +249,11 @@ public class Analizador {
         }
     }
     private void FINAL_A(){
+        if(lookAhead != null){
             if (lookAhead.getName().equals(Token.GO)){
-                    MATCH(Token.GO);
+                MATCH(Token.GO);
             }
+        }
     }
     private void ID(){
         if (lookAhead.getName().equals(Token.IDENTIFICADOR)){
@@ -216,7 +273,27 @@ public class Analizador {
     //region ERROR
     public void raiseError(List<Object> error){
         if(!flag){
-
+            TKEN tken = (TKEN) error.remove(0);
+            errors.append("Se ha encontrado un error en linea: " + tken.getLine() + "entre las columnas " + tken.getColumnBegin() +" y " + tken.getColumnEnd());
+            errors.append("Se encontró: " + tken.getName() + " se esperaba: ");
+            while(!error.isEmpty()){
+                Token err = (Token) error.remove(0);
+                if(error.isEmpty()){
+                    errors.append(err);
+                }else errors.append(err + " | ");
+            }
+            errors.append(System.lineSeparator());
+            raiseQueue();
+            flag = true;
+        }
+    }
+    private void raiseQueue(){
+        boolean isPYC = false;
+        while(!isPYC && !TOKENS.isEmpty()){
+            lookAhead = TOKENS.poll();
+            if(lookAhead.getName().equals(Token.PUNTO_COMA) || lookAhead.getName().equals(Token.GO)){
+                isPYC = true;
+            }
         }
     }
     //endregion
@@ -680,8 +757,8 @@ public class Analizador {
        DROP_DATABASE_A();
     }
     private void DROP_DATABASE_A(){
-        if(lookAhead.getName().equals(Token.PUNTO_COMA)){
-            MATCH(Token.PUNTO_COMA);
+        if(lookAhead.getName().equals(Token.COMA)){
+            MATCH(Token.COMA);
             ID();
             DROP_DATABASE_A();
          }
@@ -693,8 +770,8 @@ public class Analizador {
         DROP_VIEW_A();
     }
     private void DROP_VIEW_A(){
-        if(lookAhead.getName().equals(Token.PUNTO_COMA)){
-            MATCH(Token.PUNTO_COMA);
+        if(lookAhead.getName().equals(Token.COMA)){
+            MATCH(Token.COMA);
             Object_2();
             DROP_VIEW_A();
         }
@@ -736,7 +813,7 @@ public class Analizador {
           case USER:
               CREATE_USER();
               break;
-          case INDEX:
+          case INDEX: case UNIQUE: case NONCLUSTERED: case CLUSTERED:
               CREATE_INDEX();
               break;
           case DATABASE:
@@ -770,9 +847,11 @@ public class Analizador {
     }
     private void NOT_F_R(){
         if(lookAhead.getName().equals(Token.NOT)){
-            MATCH(Token.NOT);
-            MATCH(Token.FOR);
-            MATCH(Token.REPLICATION);
+            if(TOKENS.peek().getName().equals(Token.FOR)){
+                MATCH(Token.NOT);
+                MATCH(Token.FOR);
+                MATCH(Token.REPLICATION);
+            }
         }
     }
     private void C_N_C(){
@@ -871,7 +950,8 @@ public class Analizador {
         }
     }
     private void COLUMN_CONSTRAINT(){
-        if(lookAhead.getName().equals(Token.CONSTRAINT)){
+        if(lookAhead.getName().equals(Token.CONSTRAINT)||lookAhead.getName().equals(Token.PRIMARY)||
+        lookAhead.getName().equals(Token.UNIQUE)||lookAhead.getName().equals(Token.FOREIGN)||lookAhead.getName().equals(Token.REFERENCES)||lookAhead.getName().equals(Token.CHECK)){
             COLUMN_CONSTR_A();
             COLUMN_CONSTR_B();
             COLUMN_CONSTRAINT();
@@ -1158,7 +1238,10 @@ public class Analizador {
         } else {
             List<Object> errors = new LinkedList<>();
             errors.add(lookAhead);
-            errors.add(Token.ALTER);
+            errors.add(Token.TABLE);
+            errors.add(Token.USER);
+            errors.add(Token.DATABASE);
+            errors.add(Token.VIEW);
             raiseError(errors);
         }
 
@@ -1184,8 +1267,8 @@ public class Analizador {
             ALTER_COLUMN();
         }else if(lookAhead.getName().equals(Token.ADD)){
             MATCH(Token.ADD);
-            //CNC();
-            //CNCA();
+            C_N_C();
+            C_N_C_A();
         }else if(lookAhead.getName().equals(Token.DROP)){
             ALTER_TABLE_DROP();
         }
@@ -1213,8 +1296,8 @@ public class Analizador {
                 || lookAhead.getName().equals(Token.REAL) || lookAhead.getName().equals(Token.TIME) || lookAhead.getName().equals(Token.INT) || lookAhead.getName().equals(Token.INTEGER)
                 || lookAhead.getName().equals(Token.DECIMAL) || lookAhead.getName().equals(Token.SMALLINT) || lookAhead.getName().equals(Token.NUMERIC)){
             TIPO_DATO();
-            //COLUMN_DEFINITION_A();
-            //COLUMN_DEFINITION_G();
+            COLUMN_DEF_A();
+            COLUMN_DEF_G();
         }
     }
     private void ALTER_COLUMN_C(){
@@ -1272,12 +1355,20 @@ public class Analizador {
         }
     }
     private void ALTER_TABLE_DROP(){
-        MATCH(Token.DROP);
-        ALTER_TABLE_DROP_A();
-        ALTER_TABLE_DROP_C();
+        if(lookAhead.getName().equals(Token.DROP)) {
+            MATCH(Token.DROP);
+            ALTER_TABLE_DROP_A();
+            ALTER_TABLE_DROP_C();
+        }else{
+            List<Object> errors = new LinkedList<>();
+            errors.add(lookAhead);
+            errors.add(Token.DROP);
+            raiseError(errors);
+        }
     }
     private void ALTER_TABLE_DROP_A(){
-        if(lookAhead.getName().equals(Token.CONSTRAINT)|| lookAhead.getName().equals(Token.IF)){
+        if(lookAhead.getName().equals(Token.CONSTRAINT)|| lookAhead.getName().equals(Token.IF)||lookAhead.getName().equals(Token.IDENTIFICADOR)||
+                lookAhead.getName().equals(Token.CORCHETEA)){
             ALTER_TABLE_DROP_B();
             IF_EXISTS();
             ID();
@@ -1291,6 +1382,8 @@ public class Analizador {
             errors.add(Token.CONSTRAINT);
             errors.add(Token.IF);
             errors.add(Token.COLUMN);
+            errors.add(Token.IDENTIFICADOR);
+            errors.add(Token.CORCHETEA);
             raiseError(errors);
         }
     }
@@ -1309,7 +1402,9 @@ public class Analizador {
     private void ALTER_TABLE_DROP_D(){
         if(lookAhead.getName().equals(Token.IDENTIFICADOR)||lookAhead.getName().equals(Token.CORCHETEA)){
             ID();
-        }else if(lookAhead.getName().equals(Token.COLUMN)|| lookAhead.getName().equals(Token.CONSTRAINT)||lookAhead.getName().equals(Token.IF)){
+        }else if(lookAhead.getName().equals(Token.COLUMN)|| lookAhead.getName().equals(Token.CONSTRAINT)||lookAhead.getName().equals(Token.IF)
+                ||lookAhead.getName().equals(Token.IDENTIFICADOR)||
+                lookAhead.getName().equals(Token.CORCHETEA)){
             ALTER_TABLE_DROP_A();
         } else {
             List<Object> errors = new LinkedList<>();
@@ -1351,9 +1446,14 @@ public class Analizador {
     private void ALTER_VIEW(){
         MATCH(Token.VIEW);
         Object_2();
-        COLUMN_LIST();
+        ALTER_VIEW_A();
         MATCH(Token.AS);
         SELECT();
+    }
+    private void ALTER_VIEW_A(){
+        if(lookAhead.getName().equals(Token.PARENTESISA)){
+            COLUMN_LIST();
+        }
     }
     //endregion
     //region TRUNCATE
@@ -1362,7 +1462,7 @@ public class Analizador {
         MATCH(Token.TABLE);
         Object_3();
     }
-    //endregion}
+    //endregion
     //region WHERE
     private void WHERE(){
      if(lookAhead.getName().equals(Token.WHERE)) {
@@ -1479,7 +1579,7 @@ public class Analizador {
                 || lookAhead.getName().equals(Token.CONSTANTE_ENTERA) || lookAhead.getName().equals( Token.CONSTANTE_DECIMAL)
                 || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals(Token.ARROBA)|| lookAhead.getName().equals(Token.PARENTESISA)
                 ||lookAhead.getName().equals(Token.AVG) || lookAhead.getName().equals(Token.COUNT) || lookAhead.getName().equals(Token.MIN)
-                || lookAhead.getName().equals(Token.MAX) || lookAhead.getName().equals( Token.SUM)) {
+                || lookAhead.getName().equals(Token.MAX) || lookAhead.getName().equals( Token.SUM)||lookAhead.getName().equals(Token.NULL)) {
             ExpresionD();
             ExpresionC();
         }else{
@@ -1517,7 +1617,7 @@ public class Analizador {
                 || lookAhead.getName().equals(Token.CONSTANTE_ENTERA) || lookAhead.getName().equals(Token.CONSTANTE_DECIMAL)
                 || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals(Token.ARROBA)
                 ||lookAhead.getName().equals(Token.AVG) || lookAhead.getName().equals(Token.COUNT) || lookAhead.getName().equals(Token.MIN)
-                || lookAhead.getName().equals(Token.MAX) || lookAhead.getName().equals( Token.SUM)) {
+                || lookAhead.getName().equals(Token.MAX) || lookAhead.getName().equals( Token.SUM)||lookAhead.getName().equals(Token.NULL)) {
             ExpresionE();
         }else if (lookAhead.getName().equals(Token.PARENTESISA)) {
             MATCH(Token.PARENTESISA);
@@ -1547,7 +1647,7 @@ public class Analizador {
         if (lookAhead.getName().equals(Token.IDENTIFICADOR) || lookAhead.getName().equals(Token.CORCHETEA)) {
             Object_4();
         }else if (lookAhead.getName().equals(Token.CONSTANTE_BOOLEANA) || lookAhead.getName().equals(Token.CONSTANTE_ENTERA) || lookAhead.getName().equals(Token.CONSTANTE_DECIMAL)
-                || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals( Token.ARROBA)) {
+                || lookAhead.getName().equals(Token.CADENA) || lookAhead.getName().equals( Token.ARROBA)||lookAhead.getName().equals(Token.NULL)) {
             CONSTANTS();
         }else if(lookAhead.getName().equals(Token.AVG) || lookAhead.getName().equals(Token.COUNT) || lookAhead.getName().equals(Token.MIN)
                 || lookAhead.getName().equals(Token.MAX) || lookAhead.getName().equals( Token.SUM)){

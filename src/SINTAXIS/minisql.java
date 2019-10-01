@@ -62,7 +62,13 @@ public class minisql extends javax.swing.JFrame{
         try {
            showArea.setText(analizador.Analizar());
            analizador.Sintaxis();
-           JOptionPane.showMessageDialog(null,"ARCHIVO SINTACTICAMENTE CORRECTO");
+           String errors = analizador.returnError();
+           if(errors.isEmpty()){
+               JOptionPane.showMessageDialog(null,"ARCHIVO SINTACTICAMENTE CORRECTO");
+           }else {
+               JOptionPane.showMessageDialog(null,errors);
+           }
+
            btn_Analizar.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
