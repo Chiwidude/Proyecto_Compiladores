@@ -164,7 +164,25 @@ public class Analizador {
 
     }
     public String returnError(){
-        return errors.toString();
+        String[] lines = errors.toString().split(System.lineSeparator());
+        StringBuilder strc = new StringBuilder();
+        for(String line : lines){
+            if(line.length()>150){
+                String temp = line.substring(0,150);
+                int lastSpace = temp.lastIndexOf(" ");
+                String correct = temp.substring(0,lastSpace);
+                String other = temp.substring(lastSpace);
+                String rest = line.substring(150);
+                strc.append(correct);
+                strc.append(System.lineSeparator());
+                strc.append(other + rest);
+                strc.append(System.lineSeparator());
+            }else{
+                strc.append(line);
+                strc.append(System.lineSeparator());
+            }
+        }
+        return strc.toString();
     }
     private void INITIAL(){
         if (lookAhead.getName().equals(Token.SELECT) ||lookAhead.getName().equals(Token.INSERT)||lookAhead.getName().equals(Token.DELETE)||lookAhead.getName().equals(Token.UPDATE)||
@@ -274,8 +292,14 @@ public class Analizador {
     public void raiseError(List<Object> error){
         if(!flag){
             TKEN tken = (TKEN) error.remove(0);
-            errors.append("Se ha encontrado un error en linea: " + tken.getLine() + "entre las columnas " + tken.getColumnBegin() +" y " + tken.getColumnEnd());
-            errors.append("Se encontró: " + tken.getName() + " se esperaba: ");
+            if(tken.getColumnBegin() == tken.getColumnEnd()){
+                errors.append("Se ha encontrado un error en linea: " + tken.getLine() + " en la columna: " + tken.getColumnBegin());
+                errors.append(" Se encontró: " + tken.getName() + " se esperaba: ");
+            }else{
+                errors.append("Se ha encontrado un error en linea: " + tken.getLine() + " entre las columnas " + tken.getColumnBegin() +" y " + tken.getColumnEnd());
+                errors.append(" Se encontró: " + tken.getName() + " se esperaba: ");
+            }
+
             while(!error.isEmpty()){
                 Token err = (Token) error.remove(0);
                 if(error.isEmpty()){
