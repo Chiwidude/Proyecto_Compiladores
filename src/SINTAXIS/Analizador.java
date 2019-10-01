@@ -1250,7 +1250,7 @@ public class Analizador {
     }
     private void CREATE_USER(){
         MATCH(Token.USER);
-        MATCH(Token.IDENTIFICADOR);
+        ID();
     }
     private void CREATE_VIEW(){
         MATCH(Token.VIEW);
