@@ -1,21 +1,18 @@
 Proyecto_Compiladores
 Francisco Alonzo 1197517
 
-FUNCIONAMIENTO
+FUNCIONAMIENTO (MANEJO DE ERRORES)
 -------------------------------------------------------------------------------------------------------------------------------------
-El programa al iniciarlo, habilitar· un botÛn donde al presionarlo, mostrar· una ventana emergente, donde se debe seleccionar
-el archivo .sql, el cual ser· analizado por el analizador lÈxico. Una vez seleccionado, se habilitar· el botÛn Analizar, que al 
-presionarlo, comenzar· con el proceso de generaciÛn y compilaciÛn de la clase Lexer, basado en el archivo .flex con las reglas
-lÈxicas y analiza el archivo .sql con la clase generada. AsÌ mismo, genera un archivo .out, en la ruta donde se encuentra el archivo
-.sql, y muestra en pantalla el resultado del an·lisis lÈxico.
+El manejo de errores del analizador sint√°ctico, es de la siguiente forma:
+Al analizar un token, y este no es el token que se esperaba, el error se maneja atrav√©s del m√©todo raiseERROR, el cual crea un mensaje, donde se indica, el token que se recibi√≥ y el o los tokens que se esperaban que fueran. Se agrega a un StringBuilder, se desencola todos los tokens siguientes, hasta encontrar un punto y coma. Luego regresa a la producci√≥n Inicial, y contin√∫a el an√°lisis. Al final del an√°lisis se muestra un cuadro de di√°logo, con todos los errores que se encontraron de haber existido o muestra el mensaje "ARCHIVO SINT√ÅCTICAMENTE CORRECTO#
 
 
-ExplicaciÛn
+Explicaci√≥n
 ------------------------------------------------------------------------------------------------------------------------------------
 El programa funciona correctamente, pues se tomaron en cuenta todas las restricciones que se presentaban en el enunciado del mismo,
-tanto la validaciÛn de errores y el an·lisis lÈxico est·n calcadas en base a los requerimientos dados, asÌ programa cumple su funciÛn,
-sin problemas. Es robusto, pues al momento que se presente una condiciÛn erronea para el analizador, este mostrar· un mensaje con una des-
-cripciÛn del error, y continuar· con el an·lisis.
+tanto la validaci√≥n de errores y el an√°lisis l√©xico est√°n calcadas en base a los requerimientos dados, as√≠ programa cumple su funci√≥n,
+sin problemas. Es robusto, pues al momento que se presente una condici√≥n erronea para el analizador, este mostrar√° un mensaje con una des-
+cripci√≥n del error, y continuar√° con el an√°lisis.
 
 
 
