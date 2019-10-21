@@ -13,8 +13,8 @@ public class minisql extends javax.swing.JFrame{
     private JButton btn_rutain;
     private JButton btn_Analizar;
     private JTextArea showArea;
-    private String ruta_SQL;
-    private String path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/lexer.flex";
+        private String ruta_SQL;
+        private String path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/lexer.flex";
 
     public minisql() {
         btn_Analizar.setEnabled(false);

@@ -196,7 +196,10 @@ public class Analizador {
                     INICIAL_A();
                     FINAL();
         }else if((lookAhead.getName().equals(Token.PUNTO_COMA)||lookAhead.getName().equals(Token.GO))&& flag) {
+            if(lookAhead.getName().equals(Token.PUNTO_COMA))
             MATCH(Token.PUNTO_COMA);
+            else MATCH(Token.GO);
+            MATCH(Token.GO);
             flag = false;
         }else{
                 List<Object> errors = new LinkedList<>();
