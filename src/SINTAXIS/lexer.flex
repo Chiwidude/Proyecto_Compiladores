@@ -10,7 +10,7 @@ Digito = [0-9]
 Salto = \r| \n| \r\n
 Espacio = [ \t]
 Empty = {Salto} | {Espacio}
-String = ({Letra} | {Digito} | {Espacio} |{operadores})*
+String = ([^\r\n'])*
 /*Comentarios*/
 comlinea = ("--"){String}
 comMlinea = "/*" ~ "*/"
@@ -347,13 +347,13 @@ operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|
 
 /*                                                 IDENTIFICADORES                                                     */
 
-({Letra}) ({Letra}|{Digito}| "_" )+ {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return IDENTIFICADOR;}
+({Letra}) ({Letra}|{Digito}| "_" )* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return IDENTIFICADOR;}
 
 /*                                                         TIPOS DE DATO                                                    */
-[0 | 1 | NULL] {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_BOOLEANA;}
 ({Digito})+ {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_ENTERA;}
 ({Digito})+ "." ({Digito}*) ([E|e] [+|-]? {Digito}+)* {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return CONSTANTE_DECIMAL;}
-("'")({String})("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CADENA;}
+("'"){String}("'") {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CADENA;}
+[0 | 1 | NULL] {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength()-1; return CONSTANTE_BOOLEANA;}
 
 /*                                                       OPERADORES,PUNTUACION, OTROS                                         */ 
 "+" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return SUMA;}
