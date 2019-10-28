@@ -10,11 +10,11 @@ parser code
 {:
     private  Symbol symbol;
      StringBuilder result = new StringBuilder();
-    private List<String> errors = new LinkedList<String>();
+    private List<String> errors = new LinkedList<>();
    public void syntax_error(Symbol token){
            this.symbol =  token;
             List<Integer> ids = expected_token_ids();
-            LinkedList<String> list = new LinkedList<String>();
+            LinkedList<String> list = new LinkedList<>();
             for(Integer expected : ids){
                 list.add(symbl_name_from_id(expected));
             }
