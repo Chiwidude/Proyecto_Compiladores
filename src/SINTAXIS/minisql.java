@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class minisql extends javax.swing.JFrame{
     private JPanel minisqlPanel;
@@ -15,7 +17,12 @@ public class minisql extends javax.swing.JFrame{
     private JTextArea showArea;
     private String ruta_SQL;
     private String path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/lexer.flex";
-
+    private String path_lcup = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/LexerJcup.flex";
+    private String [] Sint_path = {
+            "-parser",
+            "Sintactic",
+            "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/Sintactic.cup"
+    };
     public minisql() {
         btn_Analizar.setEnabled(false);
         btn_rutain.addActionListener(new ActionListener() {
@@ -57,18 +64,26 @@ public class minisql extends javax.swing.JFrame{
         }
     }
     private void Btn_analizar(ActionEvent evt){
-        GenerarLexer(path);
+        try {
+            GenerarAnalizadores(path,path_lcup,Sint_path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Analizador analizador = new Analizador(ruta_SQL);
         try {
-           showArea.setText(analizador.Analizar());
+           showArea.setText(analizador.Analizar_Lexico());
+           analizador.Analizar_Sintactico();
            btn_Analizar.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    private void GenerarLexer(String path){
+    private void GenerarAnalizadores(String path, String path1, String[] paths) throws Exception {
         File lexRules = new File(path);
          String temp_path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/Lexer.java";
+         String temp_pathCup = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/LexerJcup.java";
+         String symPath = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/sym.java";
+         String sintPath = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/Sintactic.java";
          File temp = new File(temp_path);
          if(temp.exists()){
              if(temp.delete()){
@@ -77,5 +92,45 @@ public class minisql extends javax.swing.JFrame{
          }else{
              jflex.Main.generate(lexRules);
          }
+         lexRules = new File(path1);
+         temp = new File(temp_pathCup);
+         if(temp.exists()){
+             if(temp.delete()){
+                 jflex.Main.generate(lexRules);
+             }
+         }else{
+                jflex.Main.generate(lexRules);
+         }
+
+         java_cup.Main.main(paths);
+         temp = new File(symPath);
+         if(temp.exists()) {
+            if(temp.delete()) {
+                Files.move(
+                        Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/sym.java"),
+                        Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/sym.java")
+                );
+            }
+         }else{
+             Files.move(
+                     Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/sym.java"),
+                     Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/sym.java")
+             );
+         }
+         temp = new File(sintPath);
+         if(temp.exists()) {
+             if(temp.delete()) {
+                 Files.move(
+                         Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/Sintactic.java"),
+                         Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/Sintactic.java")
+                 );
+             }
+         }else{
+             Files.move(
+                     Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/sym.java"),
+                     Paths.get("C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/sym.java")
+             );
+         }
+
     }
 }

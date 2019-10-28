@@ -1,6 +1,9 @@
 package SINTAXIS;
+import java_cup.runtime.Symbol;
+
 import java.io.File;
 import java.io.*;
+import java.nio.file.Files;
 
 public class Analizador {
     public String path;
@@ -8,7 +11,7 @@ public class Analizador {
         this.path = path;
     }
 
-    public String Analizar() throws IOException {
+    public String Analizar_Lexico() throws IOException {
         Reader reader   = new BufferedReader(new FileReader(this.path));
         Lexer lexer = new Lexer(reader);
         StringBuilder result = new StringBuilder();
@@ -26,10 +29,10 @@ public class Analizador {
                         result.append( token + ": " + lexer.foundLine + " <- Cadena mal definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     }else if(lexer.foundLine.contains(("/*")))
-                        {
-                            result.append( token + ": " + lexer.foundLine + " <- Comentario con */ faltante linea: " + lexer.line + " columna inicio: " +
-                                    lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
-                        }
+                    {
+                        result.append( token + ": " + lexer.foundLine + " <- Comentario con */ faltante linea: " + lexer.line + " columna inicio: " +
+                                lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
+                    }
                     else{
                         result.append( token + ": " + lexer.foundLine + " <- Regla no definida linea: " + lexer.line + " columna inicio: " +
                                 lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
@@ -40,7 +43,7 @@ public class Analizador {
                     result.append( token + ": " + lexer.foundLine + " número decimal mal escrito linea: " + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
-                case RESERVADA:
+                default:
                     result.append(  lexer.foundLine+ " es una palabra: " + token +" linea:" + lexer.line + " columna inicio: " +
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
@@ -70,6 +73,16 @@ public class Analizador {
         }
 
 
+    }
+    public void Analizar_Sintactico () throws IOException {
+        File file = new File(path);
+        String st = new String(Files.readAllBytes(file.toPath()));
+        Sintactic sintactic = new Sintactic(new LexerJcup(new StringReader(st)));
+        try {
+          sintactic.parse();
+        } catch (Exception e) {
+            Symbol s = sintactic.getSymbol();
+        }
     }
     private void GenerarOut(String result){
         StringBuilder newpath = new StringBuilder(path.replace(".sql",".out"));
