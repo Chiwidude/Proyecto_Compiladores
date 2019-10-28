@@ -371,8 +371,7 @@ comment = {comlinea} | {comMlinea}
 "TYPE_WARNING" {return new Symbol (sym.TYPE_WARNING,yychar,yyline, yytext());}
 "FILANAME" {return new Symbol (sym.FILENAME,yychar,yyline, yytext());}
 "NAME" {return new Symbol (sym.NAME,yychar,yyline, yytext());}
-
-
+";" {Empty}* "GO" {return new Symbol (sym.PGO,yychar,yyline, yytext());}
 
 /*                                                 IDENTIFICADORES                                                     */
 

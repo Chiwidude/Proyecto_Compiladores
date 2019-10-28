@@ -7,6 +7,7 @@ import java.nio.file.Files;
 
 public class Analizador {
     public String path;
+    private String errors_St;
     public Analizador(String path){
         this.path = path;
     }
@@ -80,6 +81,10 @@ public class Analizador {
         Sintactic sintactic = new Sintactic(new LexerJcup(new StringReader(st)));
         try {
           sintactic.parse();
+          this.errors_St = sintactic.Errors();
+          if(this.errors_St.isEmpty()){
+              errors_St = "Análisis Sintáctico Sin Errores";
+          }
         } catch (Exception e) {
             Symbol s = sintactic.getSymbol();
         }
@@ -94,5 +99,9 @@ public class Analizador {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getErrors_St() {
+        return errors_St;
     }
 }

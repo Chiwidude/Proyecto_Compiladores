@@ -15,6 +15,7 @@ public class minisql extends javax.swing.JFrame{
     private JButton btn_rutain;
     private JButton btn_Analizar;
     private JTextArea showArea;
+    private JTextArea textArea1;
     private String ruta_SQL;
     private String path = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/lexer.flex";
     private String path_lcup = "C:/PROYECTO_COMPILADORES/PROYECTO/src/SINTAXIS/LexerJcup.flex";
@@ -73,6 +74,7 @@ public class minisql extends javax.swing.JFrame{
         try {
            showArea.setText(analizador.Analizar_Lexico());
            analizador.Analizar_Sintactico();
+            textArea1.setText(analizador.getErrors_St());
            btn_Analizar.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
