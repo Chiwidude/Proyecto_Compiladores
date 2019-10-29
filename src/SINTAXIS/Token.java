@@ -372,5 +372,12 @@ public enum Token {
  OPTIMISTIC,
  TYPE_WARNING,
  FILENAME,
- NAME
+ NAME,
+ PGO,
+ KB,
+ MB,
+ TB,
+ GB,
+ MAXSIZE,
+ UNLIMITED
 }

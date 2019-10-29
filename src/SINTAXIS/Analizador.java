@@ -16,7 +16,6 @@ public class Analizador {
         Reader reader   = new BufferedReader(new FileReader(this.path));
         Lexer lexer = new Lexer(reader);
         StringBuilder result = new StringBuilder();
-
         while(true){
             Token token = lexer.yylex();
             if(token == null){
@@ -63,7 +62,7 @@ public class Analizador {
                             lexer.columnSt + " columna fin: " + lexer.columnNd + "\n");
                     break;
                 case ASIGNACION: case SUMA: case RESTA: case MULTIPLICACION: case DIFERENCIA: case DIVISION: case MOD: case MAYOR: case MAYOR_IGUAL:
-                case MENOR: case MENOR_IGUAL: case IGUALACION: case CONSTANTE_DECIMAL: case AND: case ARROBA: case COMA: case CORCHETEA: case PUNTO_COMA: case CONSTANTE_BOOLEANA:
+                case MENOR: case MENOR_IGUAL: case IGUALACION: case CONSTANTE_DECIMAL: case AND: case ARROBA: case COMA: case CORCHETEA: case PGO: case PUNTO_COMA: case CONSTANTE_BOOLEANA:
                 case CONSTANTE_ENTERA: case CORCHETEC: case CORCHETES: case LLAVEC: case PARENTESISC: case EXCLAMACION: case LLAVEA: case LLAVES: case NUMERAL: case NUMERALES:
                 case PARENTESIS: case PARENTESISA: case PUNTO: case OR:
                     result.append(  lexer.foundLine+ " es un símbolo de : " + token +" linea:" + lexer.line + " columna inicio: " +

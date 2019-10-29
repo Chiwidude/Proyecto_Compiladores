@@ -372,6 +372,12 @@ comment = {comlinea} | {comMlinea}
 "FILANAME" {return new Symbol (sym.FILENAME,yychar,yyline, yytext());}
 "NAME" {return new Symbol (sym.NAME,yychar,yyline, yytext());}
 ";" {Empty}* "GO" {return new Symbol (sym.PGO,yychar,yyline, yytext());}
+"KB" {return new Symbol (sym.KB,yychar,yyline, yytext());}
+"MB" {return new Symbol (sym.MB,yychar,yyline, yytext());}
+"GB" {return new Symbol (sym.GB,yychar,yyline, yytext());}
+"TB" {return new Symbol (sym.TB,yychar,yyline, yytext());}
+"MAXSIZE" {return new Symbol (sym.MAXSIZE,yychar,yyline, yytext());}
+"UNLIMITED" {return new Symbol (sym.UNLIMITED,yychar,yyline, yytext());}
 
 /*                                                 IDENTIFICADORES                                                     */
 
