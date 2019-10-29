@@ -220,7 +220,7 @@ ExpresionC ::= MULTIPLICACION ExpresionD ExpresionC | DIVISION ExpresionD Expres
 
 ExpresionD ::= 	PARENTESISA Expresion PredicadoC PARENTESISC | ExpresionE;
 
-ExpresionE ::= 	Object4 | CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA | NULL
+ExpresionE ::= 	Object4 | CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA | NULL | Variable
         | SUM PARENTESISA ExpresionF
 	| AVG PARENTESISA ExpresionF
 	| MIN PARENTESISA ExpresionF
@@ -608,9 +608,9 @@ FuncOpcC ::= ON | OFF;
 
 ExecProcedureA ::= ClauseExec IDENTIFICADOR  | ClauseExec IDENTIFICADOR PARENTESISA RepeatProcedure PARENTESISC  | ClauseExec IDENTIFICADOR RepeatProcedure ;
 
-    RepeatProcedure ::= Variable ASIGNACION Data_Type | Variable ASIGNACION Data_Type RepeatProcedureA | Data_Type | Data_Type RepeatProcedureA;
+RepeatProcedure ::= Variable ASIGNACION Data_Type | Variable ASIGNACION Data_Type RepeatProcedureA | Data_Type | Data_Type RepeatProcedureA;
 
-    RepeatProcedureA ::= COMA Variable ASIGNACION Data_Type RepeatProcedureA | COMA Data_Type;
+RepeatProcedureA ::= COMA Variable ASIGNACION Data_Type RepeatProcedureA | COMA Data_Type;
 
-    Data_Type ::=  CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA;
+Data_Type ::=  CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA;
 
