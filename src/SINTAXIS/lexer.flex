@@ -374,7 +374,7 @@ operadores=("+")|("-")|("*")|("/")|("%")|("<")|("<=")|(">")|(">=")|("=")|("==")|
 "MAXSIZE" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return MAXSIZE;}
 "UNLIMITED" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return UNLIMITED;}
 ";" {Empty}* "GO" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return PGO;}
-
+"DELAYED_DURABILITY" {foundLine = yytext(); line = yyline; columnSt = yycolumn; columnNd = yycolumn + yylength() -1; return DELAYED_DURABILITY;}
 
 
 /*                                                 IDENTIFICADORES                                                     */

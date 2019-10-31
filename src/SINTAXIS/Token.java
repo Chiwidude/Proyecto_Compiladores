@@ -379,5 +379,6 @@ public enum Token {
  TB,
  GB,
  MAXSIZE,
- UNLIMITED
+ UNLIMITED,
+ DELAYED_DURABILITY
 }

@@ -378,6 +378,7 @@ comment = {comlinea} | {comMlinea}
 "TB" {return new Symbol (sym.TB,yycolumn,yyline, yytext());}
 "MAXSIZE" {return new Symbol (sym.MAXSIZE,yycolumn,yyline, yytext());}
 "UNLIMITED" {return new Symbol (sym.UNLIMITED,yycolumn,yyline, yytext());}
+"DELAYED_DURABILITY" {return new Symbol (sym.DELAYED_DURABILITY,yycolumn,yyline, yytext());}
 
 /*                                                 IDENTIFICADORES                                                     */
 
