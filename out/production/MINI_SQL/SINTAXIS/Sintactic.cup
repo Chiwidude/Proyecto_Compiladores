@@ -135,18 +135,23 @@ ProcOption, ProcOption1, ProcOption2, ClauseExec, ProcOptionRec, Clause, Replica
 StmtSP2, Function, PARAMS, OrAlter, PARAM, PARAM_A, PARAM_B, As, ReadOnly, Type_Return, Data, Table, SCT, DType,
 With, FuncOpc, FuncOpcA, FuncOpcB, FuncOpcC, Cursores , VariableList, VariableLista, CursorDeclare, CursorDeclarea,
 CursorDeclareb, CursorDeclarec, CursorDeclared, CursorDeclaree,Variable,OBooleanos,NFR1,NFR2,ColumnDefZ,ColumnDefV,ColumnDefW,ColumnDefX,ColumnDefY,Sizenw,Sizew,EXECUTE_AS_CLAUSE,
-ExecProcedureA,RepeatProcedure,RepeatProcedureA, Data_Type;
+ExecProcedureA,RepeatProcedure,RepeatProcedureA, Data_Type, CallFunction, FunctionContent, FunctionContentA, DTypes;
+
+precedence right Not, Object4;
+precedence left PARENTESISA, Object2;
+
 
 start with Inicial;
 
-Inicial ::= InicialA Final Inicial |error Final Inicial|;
-InicialA ::= DML | DDL | TCL | TSQL;
+Inicial ::= InicialA|;
+InicialA ::= DML Inicial | DDL Final Inicial | TCL Inicial | TSQL Final Inicial |
+USE Object4 Final Inicial;
 
-DML ::=	Select | Insert | Delete | Update;
+DML ::=	Select Final | Insert Final | Delete Final | Update Final | error Final;
 
 DDL ::= Create | Alter | Drop | Truncate;
 
-TCL ::= BeginTran | Rollback | Commit | SavePoint;
+TCL ::= BeginTran Final | Rollback Final | Commit Final | SavePoint Final;
 
 TSQL ::= CursorDeclare | ExecProcedureA ;
 
@@ -220,8 +225,8 @@ ExpresionC ::= MULTIPLICACION ExpresionD ExpresionC | DIVISION ExpresionD Expres
 
 ExpresionD ::= 	PARENTESISA Expresion PredicadoC PARENTESISC | ExpresionE;
 
-ExpresionE ::= 	Object4 | CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA | NULL | Variable
-        | SUM PARENTESISA ExpresionF
+ExpresionE ::= 	Object4 CallFunction | CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA | NULL | Variable
+    | SUM PARENTESISA ExpresionF
 	| AVG PARENTESISA ExpresionF
 	| MIN PARENTESISA ExpresionF
 	| MAX PARENTESISA ExpresionF
@@ -231,6 +236,12 @@ ExpresionF ::= 	Object4 PARENTESISC
 	| CONSTANTE_ENTERA PARENTESISC
 	| MULTIPLICACION PARENTESISC;
 
+CallFunction ::= PARENTESISA FunctionContent PARENTESISC|;
+
+FunctionContent ::= DType FunctionContentA;
+
+FunctionContentA ::= COMA FunctionContent|;
+
 Not ::= NOT |;
 
 Top ::= TOP PARENTESISA CONSTANTE_ENTERA PARENTESISC TopA |;
@@ -239,7 +250,7 @@ TopA ::= PERCENT |;
 
 Expresiones ::= COMA Expresion Expresiones |;
 
-SearchCondition ::= Not Predicado SearchConditionA;
+SearchCondition ::= Not Predicado SearchConditionA | PARENTESISA SearchCondition PARENTESISC SearchConditionA;
 
 SearchConditionA ::= AND SearchCondition| OR SearchCondition|;
 
@@ -278,7 +289,7 @@ OrderA ::= COLLATE ID |;
 
 OrderB ::= ASC | DESC |;
 
-OrderC ::= Expresion OrderA OrderB |;
+OrderC ::= COMA Expresion OrderA OrderB |;
 
 Group ::= GROUP BY Expresion GroupA |;
 
@@ -306,7 +317,7 @@ FromDelete ::= FROM |;
 
 DeleteA ::= OPENQUERY Server | Object3 DeleteB Where;
 
-DeleteB ::= FROM Object3 DeleteC;
+DeleteB ::= FROM Object3 DeleteC|;
 
 DeleteC ::= COMA Object3 DeleteC |;
 
@@ -336,7 +347,7 @@ Create ::= CREATE CreateA;
 
 CreateA ::= CreateTable | CreateDB | CreateIndex | CreateUser | CreateView | Procedure | Function;
 
-CreateUser ::= 	USER IDENTIFICADOR;
+CreateUser ::= 	USER ID;
 
 CreateDB ::= DATABASE ID CreateDBA;
 
@@ -541,7 +552,7 @@ ParamsA_SP ::= Variable TipoD_SP ParamsB_SP;
 
 ParamsB_SP ::= COMA ParamsA_SP |;
 
-TipoD_SP ::= Tipo_datoA TipoD_SP1 TipoD_SP2
+TipoD_SP ::= Tipo_dato TipoD_SP1 TipoD_SP2
 	| CURSOR VARYING TipoD_SP3
 	| ID READONLY;
 
@@ -567,11 +578,11 @@ ReplicationSP ::= FOR REPLICATION |;
 
 StartSP ::= BEGIN StmtSP END;
 
-StmtSP ::= DML Final StmtSP1;
+StmtSP ::= DML  StmtSP1;
 
-StmtSP1 ::= DML Final StmtSP2 |;
+StmtSP1 ::= DML  StmtSP2 |;
 
-StmtSP2 ::= DML Final |;
+StmtSP2 ::= DML|;
 
 CursorDeclare ::=	DECLARE ID CURSOR CursorDeclarea CursorDeclareb CursorDeclarec FOR Select CursorDeclared;
 CursorDeclarea ::=	LOCAL
@@ -595,22 +606,24 @@ PARAM_B ::= COMA PARAM_A|;
 As ::= AS |;
 ReadOnly ::= READONLY|;
 Type_Return ::= Data | Table;
-Data ::= Tipo_datoA With As BEGIN DML RETURN DType END;
+Data ::= Tipo_datoA With As BEGIN DML RETURN DTypes END;
 Table ::= TABLE With As RETURN SCT;
 SCT ::= PARENTESISA Select PARENTESISC | Select;
 DType ::= VARIABLE | CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA;
-With ::= WITH FuncOpc;
+With ::= WITH FuncOpc|;
 FuncOpc ::= FuncOpcA FuncOpcB;
 EXECUTE_AS_CLAUSE ::= ClauseExec AS Clause;
 FuncOpcA ::= ENCRYPTION  | SCHEMABINDING | RETURNS NULL ON NULL INPUT | CALLED ON NULL INPUT | EXECUTE_AS_CLAUSE | INLINE  ASIGNACION FuncOpcC;
 FuncOpcB ::= COMA FuncOpc |;
 FuncOpcC ::= ON | OFF;
 
-ExecProcedureA ::= ClauseExec IDENTIFICADOR  | ClauseExec IDENTIFICADOR PARENTESISA RepeatProcedure PARENTESISC  | ClauseExec IDENTIFICADOR RepeatProcedure ;
+DTypes ::= PARENTESISA DType PARENTESISC | DType;
 
-RepeatProcedure ::= Variable ASIGNACION Data_Type | Variable ASIGNACION Data_Type RepeatProcedureA | Data_Type | Data_Type RepeatProcedureA;
+ExecProcedureA ::= ClauseExec Object2 | ClauseExec Object2 PARENTESISA RepeatProcedure PARENTESISC  | ClauseExec Object2 RepeatProcedure ;
 
-RepeatProcedureA ::= COMA Variable ASIGNACION Data_Type RepeatProcedureA | COMA Data_Type;
+RepeatProcedure ::= Variable ASIGNACION Data_Type RepeatProcedureA| Data_Type RepeatProcedureA;
+
+RepeatProcedureA ::= COMA RepeatProcedure|;
 
 Data_Type ::=  CONSTANTE_ENTERA | CONSTANTE_DECIMAL | CADENA | CONSTANTE_BOOLEANA;
 
